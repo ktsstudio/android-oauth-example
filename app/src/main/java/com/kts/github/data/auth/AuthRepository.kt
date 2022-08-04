@@ -4,6 +4,7 @@ import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.EndSessionRequest
 import net.openid.appauth.TokenRequest
+import timber.log.Timber
 
 class AuthRepository {
 
@@ -34,5 +35,6 @@ class AuthRepository {
         TokenStorage.accessToken = tokens.accessToken
         TokenStorage.refreshToken = tokens.refreshToken
         TokenStorage.idToken = tokens.idToken
+        Timber.tag("Oauth").d("6. Tokens accepted:\n access=${tokens.accessToken}\nrefresh=${tokens.refreshToken}\nidToken=${tokens.idToken}")
     }
 }

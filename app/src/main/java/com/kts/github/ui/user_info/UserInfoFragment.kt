@@ -1,5 +1,6 @@
 package com.kts.github.ui.user_info
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,8 +20,16 @@ class UserInfoFragment : Fragment(R.layout.fragment_user_info) {
     private val viewModel: UserInfoViewModel by viewModels()
     private val binding by viewBinding(FragmentUserInfoBinding::bind)
 
-    private val logoutResponse = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        viewModel.webLogoutComplete()
+    private val logoutResponse = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if(result.resultCode == Activity.RESULT_OK) {
+            viewModel.webLogoutComplete()
+        } else {
+            // логаут отменен
+            // делаем complete тк github не редиректит после логаута и пользователь закрывает CCT
+            viewModel.webLogoutComplete()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

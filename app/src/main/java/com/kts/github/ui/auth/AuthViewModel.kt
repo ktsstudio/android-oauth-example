@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.TokenRequest
+import timber.log.Timber
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -46,12 +47,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onAuthCodeReceived(tokenRequest: TokenRequest) {
+
+        Timber.tag("Oauth").d("3. Received code = ${tokenRequest.authorizationCode}")
+
         viewModelScope.launch {
             loadingMutableStateFlow.value = true
             runCatching {
+                Timber.tag("Oauth").d("4. Change code to token. Url = ${tokenRequest.configuration.tokenEndpoint}, verifier = ${tokenRequest.codeVerifier}")
                 authRepository.performTokenRequest(
                     authService = authService,
-                    tokenRequest = tokenRequest)
+                    tokenRequest = tokenRequest
+                )
             }.onSuccess {
                 loadingMutableStateFlow.value = false
                 authSuccessEventChannel.send(Unit)
@@ -65,12 +71,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun openLoginPage() {
         val customTabsIntent = CustomTabsIntent.Builder().build()
 
+        val authRequest = authRepository.getAuthRequest()
+
+        Timber.tag("Oauth").d("1. Generated verifier=${authRequest.codeVerifier},challenge=${authRequest.codeVerifierChallenge}")
+
         val openAuthPageIntent = authService.getAuthorizationRequestIntent(
-            authRepository.getAuthRequest(),
+            authRequest,
             customTabsIntent
         )
 
         openAuthPageEventChannel.trySendBlocking(openAuthPageIntent)
+        Timber.tag("Oauth").d("2. Open auth page: ${authRequest.toUri()}")
     }
 
     override fun onCleared() {
