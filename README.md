@@ -2,6 +2,8 @@
 
 Разработан в качестве материала к статье: https://habr.com/ru/company/kts/blog/654029/
 
+Доклад Android Broadcast: https://www.youtube.com/watch?v=PFZ3cwxn9Wk
+
 Функционал:
 - AppAuth
 - chrome custom tabs
